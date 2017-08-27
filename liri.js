@@ -6,9 +6,6 @@ var Spotify = require('node-spotify-api');
 var request = require('request');
 // require Node fs library for filesystem access
 var fs = require('fs');
-// access twitter keys inside twitterKeysObject
-var client = new twitter(keys.twitterKeys);
-
 // possible command line inputs include:
 // my-tweets, spotify-this-song, movie-this, do-what-it-says
 // save command to variable and use switch
@@ -30,24 +27,52 @@ var nodeArgs = process.argv;
 switch (functionName) {
 	// handle my-tweets
 	case 'my-tweets':
-	console.log(tweets);
-		showTweets();
-		break;
+	  // console.log("tweets");
+	  showTweets();
+	  break;
 	// handle spotify-this-song:
 	case 'spotify-this-song':
-		  mySpotify(functionParameters);
-		  break;
+	  // console.log("song");
+	  mySpotify(functionParameters);
+	  break;
 	// handle movie-this:
 	case 'movie-this':
-		movieThis(functionParameters);
-		break;
+	  // console.log("movies");
+	  movieThis(functionParameters);
+	  break;
 	// handle do-what-it-says
 	case 'do-what-it-says':
-	    doWhatItSays();
-	break;
+	  doWhatItSays();
+	  break;
 	// default response for invalid command
 	default:
-		console.log("Invalid Command. Please try again!")
+	  console.log("Invalid Command. Please try again!")
+}
+
+function showTweets() {
+	// access twitter keys inside keys object
+	var client = new Twitter(keys.twitterKeys);
+	// twitter search parameters
+	var params = {
+		screen_name: 'sjm27527',
+		count: 20
+    };
+
+    client.get('statuses/user_timeline', params, function(error, tweets, response) {
+    	if (error) {
+    		console.log("Twitter Error");
+    	} else {
+    		console.log('');
+    		console.log('My last 20 tweets: ');
+    		console.log('------------------------');
+    		tweets.forEach(function(individualTweet) {
+    			console.log('Time Posted: ' + individualTweet.created_at);
+    			console.log('Tweet: ' + individualTweet.text);
+    			console.log('_____________________');
+    		});
+    	}
+    });
+
 }
 
 function mySpotify(functionParameters) {
@@ -55,7 +80,9 @@ function mySpotify(functionParameters) {
   		id: "0888876dd4e746b69a275d3c58cd021c",
   		secret: "4afc6e98cbf6417996aa4beb038144c3"
 });
- 
+ 	if(functionParameters < 1) {
+ 		functionParameters = "The Sign Ace of Base";
+ 	}
 spotify.search({ type: 'track', query: functionParameters }, function(err, data) {
   if (err) {
   	console.log('Error occurred: ' + err);
@@ -72,24 +99,38 @@ spotify.search({ type: 'track', query: functionParameters }, function(err, data)
 });
 }
 
+function movieThis(functionParameters) {
+	if (functionParameters.length < 1) {
+		functionParameters = "Mr. Nobody";
+	};
+	request("http://www.omdbapi.com/?t=" + functionParameters + "&y=&plot=short&apikey=40e9cece", function(error, response, body) {
+		if(!error && response.statusCode === 200) {
+			console.log("Title: " + JSON.parse(body).Title);
+			console.log("Title: " + JSON.parse(body).imdbRating);
+			console.log("Title: " + JSON.parse(body).Ratings[1].Value);
+			console.log("Title: " + JSON.parse(body).Country);
+			console.log("Title: " + JSON.parse(body).Language);
+			console.log("Title: " + JSON.parse(body).Plot);
+			console.log("Title: " + JSON.parse(body).Actors);
+		} else {
+			console.log("Movie Search Error")
+		}
 
+	});
+}
 
-// if my-tweets argument is received
-// function myTweets() {
-// 	// set up object fot twitter credentials
-// 	var client = new Twitter({
-// 	  consumer_key: '',
-// 	  consumer_secret: '',
-// 	  access_token_key: '',
-// 	  access_token_secret: ''
-// });
- 
-// var params = {screen_name: 'nodejs'};
-// client.get('statuses/user_timeline', params, function(error, tweets, response) {
-//   if (!error) {
-//     console.log(tweets);
-//   }
-// });
+function doWhatItSays() {
+	fs.readFile('random.txt', 'utf8' , function(err, data) {
+		if(err) throw err;
+		console.log(data);
+
+		var dataArr = data.split(',');
+
+		functionName = dataArr[0].trim();
+		functionParameters = dataArr[1].trim();
+	});
+
+}
 
 
 
