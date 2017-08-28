@@ -23,7 +23,7 @@ var nodeArgs = process.argv;
         }
     }
 
-// switch based on command input
+// switch based on command line input
 switch (functionName) {
 	// handle my-tweets
 	case 'my-tweets':
@@ -46,9 +46,10 @@ switch (functionName) {
 	  break;
 	// default response for invalid command
 	default:
-	  console.log("Invalid Command. Please try again!")
+	  console.log("Invalid Command. Please try again! Acceptable commands: my-tweets, spotify-this-song, movie-this and do-what-it-says")
 }
 
+// function to display last 20 tweets
 function showTweets() {
 	// access twitter keys inside keys object
 	var client = new Twitter(keys.twitterKeys);
@@ -75,6 +76,7 @@ function showTweets() {
 
 }
 
+// function to spotify a song title. Don't forget to handle blank input.
 function mySpotify(functionParameters) {
 	var spotify = new Spotify({
   		id: "0888876dd4e746b69a275d3c58cd021c",
@@ -99,6 +101,7 @@ spotify.search({ type: 'track', query: functionParameters }, function(err, data)
 });
 }
 
+// function to OMDB search movie information based on title. Don't forget to handle blank input.
 function movieThis(functionParameters) {
 	if (functionParameters.length < 1) {
 		functionParameters = "Mr. Nobody";
@@ -119,6 +122,7 @@ function movieThis(functionParameters) {
 	});
 }
 
+// function for do-what-it-says using fileserver library.
 function doWhatItSays() {
 	fs.readFile('random.txt', 'utf8' , function(err, data) {
 		if(err) throw err;
@@ -128,6 +132,25 @@ function doWhatItSays() {
 
 		functionName = dataArr[0].trim();
 		functionParameters = dataArr[1].trim();
+
+	// re-use switch for search parameters
+	 
+	switch (functionName) {
+		case 'my-tweets':
+		  showTweets();
+		  break;
+		case 'spotify-this-song': 
+		  mySpotify(functionParameters);
+		  break;
+		case 'movie-this':
+		  movieThis(functionParameters);
+		  break;
+		case 'do-what-it-says':
+		  doWhatItSays();
+		  break;
+		default:
+		  console.log("Invalid Command. Please try again!");
+}
 	});
 
 }
