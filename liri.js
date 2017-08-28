@@ -23,7 +23,7 @@ var nodeArgs = process.argv;
         }
     }
 
-// switch based on command line input
+{// switch based on command line input
 switch (functionName) {
 	// handle my-tweets
 	case 'my-tweets':
@@ -47,7 +47,8 @@ switch (functionName) {
 	// default response for invalid command
 	default:
 	  console.log("Invalid Command. Please try again! Acceptable commands: my-tweets, spotify-this-song, movie-this and do-what-it-says")
-}
+}};
+
 
 // function to display last 20 tweets
 function showTweets() {
@@ -109,15 +110,26 @@ function movieThis(functionParameters) {
 	request("http://www.omdbapi.com/?t=" + functionParameters + "&y=&plot=short&apikey=40e9cece", function(error, response, body) {
 		if(!error && response.statusCode === 200) {
 			console.log("Title: " + JSON.parse(body).Title);
-			console.log("Title: " + JSON.parse(body).imdbRating);
-			console.log("Title: " + JSON.parse(body).Ratings[1].Value);
-			console.log("Title: " + JSON.parse(body).Country);
-			console.log("Title: " + JSON.parse(body).Language);
-			console.log("Title: " + JSON.parse(body).Plot);
-			console.log("Title: " + JSON.parse(body).Actors);
+			console.log("imdbRating: " + JSON.parse(body).imdbRating);
+			// console.log("Title: " + JSON.parse(body).Ratings[1].Value);
+			var rotten;
+		      if(!JSON.parse(body).Ratings || !JSON.parse(body).Ratings[1]){
+                rotten = "No Rotten Tomatoes Score"
+              }
+               else {
+              rotten = JSON.parse(body).Ratings[1].Value
+              }
+
+         console.log("Rotten Tomatoes Rating: " + rotten);
+			console.log("Country: " + JSON.parse(body).Country);
+			console.log("Language: " + JSON.parse(body).Language);
+			console.log("Plot: " + JSON.parse(body).Plot);
+			console.log("Actors: " + JSON.parse(body).Actors);
 		} else {
 			console.log("Movie Search Error")
 		}
+
+		
 
 	});
 }
@@ -133,25 +145,28 @@ function doWhatItSays() {
 		functionName = dataArr[0].trim();
 		functionParameters = dataArr[1].trim();
 
+
+
 	// re-use switch for search parameters
 	 
 	switch (functionName) {
 		case 'my-tweets':
-		  showTweets();
+	 	  showTweets();
+    	  break;
+	 	case 'spotify-this-song': 
+	 	  mySpotify(functionParameters);
 		  break;
-		case 'spotify-this-song': 
-		  mySpotify(functionParameters);
+	 	case 'movie-this':
+	 	  movieThis(functionParameters);
+	 	  break;
+	 	case 'do-what-it-says':
+	 	  doWhatItSays();
 		  break;
-		case 'movie-this':
-		  movieThis(functionParameters);
-		  break;
-		case 'do-what-it-says':
-		  doWhatItSays();
-		  break;
-		default:
-		  console.log("Invalid Command. Please try again!");
-}
+	 	default:
+	 	  console.log("Invalid Command. Please try again!");
+		}
 	});
+
 
 }
 
